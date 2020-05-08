@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>Zwyssigly.ImageServer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zwyssigly.ImageServer.Embedded\Zwyssigly.ImageServer.Embedded.csproj" />
+    <ProjectReference Include="..\Zwyssigly.ImageServer.Contracts\Zwyssigly.ImageServer.Contracts.csproj" />
+    <ProjectReference Include="..\Zwyssigly.ImageServer.MongoDb\Zwyssigly.ImageServer.MongoDb.csproj" />
+    <ProjectReference Include="..\Zwyssigly.ImageServer.Standalone\Zwyssigly.ImageServer.Standalone.csproj" />
+  </ItemGroup>
+
+</Project>

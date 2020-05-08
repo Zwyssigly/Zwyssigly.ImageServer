@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29926.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zwyssigly.ImageServer.MongoDb", "Zwyssigly.ImageServer.MongoDb\Zwyssigly.ImageServer.MongoDb.csproj", "{67620001-1A81-4711-9876-3BCA1D8D4A92}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zwyssigly.ImageServer.Standalone", "Zwyssigly.ImageServer.Standalone\Zwyssigly.ImageServer.Standalone.csproj", "{00119D80-A212-4B92-8A12-47604DBA6E36}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zwyssigly.ImageServer.Test", "Zwyssigly.ImageServer.Test\Zwyssigly.ImageServer.Test.csproj", "{D872702B-B54B-4225-A424-F16555A8C64B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zwyssigly.ImageServer.Contracts", "Zwyssigly.ImageServer.Contracts\Zwyssigly.ImageServer.Contracts.csproj", "{3B3E2638-9F1D-4214-9884-845920D52BFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zwyssigly.ImageServer.Embedded", "Zwyssigly.ImageServer.Embedded\Zwyssigly.ImageServer.Embedded.csproj", "{9C190B30-4810-4AF1-846E-6FD09D3A0EFF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zwyssigly.ImageServer.Core", "Zwyssigly.ImageServer.Core\Zwyssigly.ImageServer.Core.csproj", "{0B6678AE-ECA3-418F-961C-04FE396710E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67620001-1A81-4711-9876-3BCA1D8D4A92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67620001-1A81-4711-9876-3BCA1D8D4A92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67620001-1A81-4711-9876-3BCA1D8D4A92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67620001-1A81-4711-9876-3BCA1D8D4A92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00119D80-A212-4B92-8A12-47604DBA6E36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00119D80-A212-4B92-8A12-47604DBA6E36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00119D80-A212-4B92-8A12-47604DBA6E36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00119D80-A212-4B92-8A12-47604DBA6E36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D872702B-B54B-4225-A424-F16555A8C64B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D872702B-B54B-4225-A424-F16555A8C64B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D872702B-B54B-4225-A424-F16555A8C64B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D872702B-B54B-4225-A424-F16555A8C64B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B3E2638-9F1D-4214-9884-845920D52BFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B3E2638-9F1D-4214-9884-845920D52BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B3E2638-9F1D-4214-9884-845920D52BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B3E2638-9F1D-4214-9884-845920D52BFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C190B30-4810-4AF1-846E-6FD09D3A0EFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C190B30-4810-4AF1-846E-6FD09D3A0EFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C190B30-4810-4AF1-846E-6FD09D3A0EFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C190B30-4810-4AF1-846E-6FD09D3A0EFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B6678AE-ECA3-418F-961C-04FE396710E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B6678AE-ECA3-418F-961C-04FE396710E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B6678AE-ECA3-418F-961C-04FE396710E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B6678AE-ECA3-418F-961C-04FE396710E0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {38D4314B-A6F6-422C-B451-5E5EF7CFE0BA}
+	EndGlobalSection
+EndGlobal
