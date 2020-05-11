@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
+using System.Globalization;
 
 namespace Zwyssigly.ImageServer.MongoDb
 {
@@ -21,5 +22,11 @@ namespace Zwyssigly.ImageServer.MongoDb
 
         [BsonElement("crop")]
         public string CropStrategy { get; set; }
+
+        [BsonElement("q")]
+        public float Quality { get; set; }
+
+        [BsonElement("dupl")]
+        public string DuplicateOf { get; set; }
     }
 }

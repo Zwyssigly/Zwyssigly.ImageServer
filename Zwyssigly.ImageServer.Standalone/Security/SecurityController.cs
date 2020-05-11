@@ -29,14 +29,7 @@ namespace Zwyssigly.ImageServer.Standalone.Security
         [HttpPut("security/{galleryName}")]
         public async Task<IActionResult> Put([FromRoute]string galleryName, [FromBody] SecurityConfiguration model)
         {
-            var result = await _securityService.ConfigureAsync(galleryName, model);
-            return result.AsActionResult();
-        }
-
-        [HttpDelete("security/{galleryName}")]
-        public async Task<IActionResult> Delete([FromRoute]string galleryName)
-        {
-            var result = await _securityService.DeleteAsync(galleryName);
+            var result = await _securityService.SetAsync(galleryName, model);
             return result.AsActionResult();
         }
 
@@ -50,7 +43,7 @@ namespace Zwyssigly.ImageServer.Standalone.Security
         [HttpPut("security-global")]
         public async Task<IActionResult> Put([FromBody] SecurityConfiguration model)
         {
-            var result = await _securityService.ConfigureGlobalAsync(model);
+            var result = await _securityService.SetGlobalAsync(model);
             return result.AsActionResult();
         }
     }

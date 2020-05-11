@@ -46,7 +46,7 @@ export default {
     submit (evt) {
       evt.preventDefault();
 
-      this.$store.commit('app/basicAuth', { username: this.username, password: this.password });
+      this.$auth.login(this.username, this.password);
       this.$router.replace({ name: 'index' });
     }
   }

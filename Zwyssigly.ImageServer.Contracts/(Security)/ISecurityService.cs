@@ -10,9 +10,7 @@ namespace Zwyssigly.ImageServer.Contracts
         Task<Result<SecurityConfiguration, Error>> GetAsync(string galleryName);
         Task<Result<SecurityConfiguration, Error>> GetGlobalAsync();
 
-        Task<Result<Unit, Error>> ConfigureAsync(string galleryName, SecurityConfiguration configuration);
-        Task<Result<Unit, Error>> ConfigureGlobalAsync(SecurityConfiguration configuration);
-
-        Task<Result<Unit, Error>> DeleteAsync(string galleryName);
+        Task<Result<Unit, Error>> SetAsync(string galleryName, SecurityConfiguration configuration);
+        Task<Result<Unit, Error>> SetGlobalAsync(SecurityConfiguration configuration);
     }
 }

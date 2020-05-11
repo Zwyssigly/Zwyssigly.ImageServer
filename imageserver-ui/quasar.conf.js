@@ -15,7 +15,7 @@ module.exports = function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/cli-documentation/boot-files
     boot: [
-      'auth',
+      'client',
       'axios',
     ],
 
@@ -121,10 +121,10 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'Image Server UI',
+        name: 'Image Server',
         
-        short_name: 'Image Server UI',
-        description: 'Admin Interface for managing an image server',
+        short_name: 'Image Server',
+        description: 'Admin interface for managing an Image Server',
         display: 'standalone',
         orientation: 'portrait',
         

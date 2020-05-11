@@ -8,8 +8,10 @@
         public ushort Height { get; }
         public string? CropStrategy { get; }
         public string Format { get; }
+        public float Quality { get; }
+        public string? DuplicateOf { get; }
 
-        public ImageSize(string tag, string aspectRatio, ushort width, ushort height, string? cropStrategy, string format)
+        public ImageSize(string tag, string aspectRatio, ushort width, ushort height, string? cropStrategy, string format, float quality, string? duplicateOf)
         {
             Tag = tag;
             AspectRatio = aspectRatio;
@@ -17,6 +19,8 @@
             Height = height;
             CropStrategy = cropStrategy;
             Format = format;
+            Quality = quality;
+            DuplicateOf = duplicateOf;
         }
     }
 }

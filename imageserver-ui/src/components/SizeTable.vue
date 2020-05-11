@@ -9,11 +9,13 @@
       :pagination.sync="pagination"
     >
       <template v-slot:top-right>
-        <q-btn color="primary" label="Add size" @click="addSize" />
+        <q-btn color="primary" label="Add size" @click="add()" />
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn icon="edit" dense flat round @click="editSize(props.row.index)" />
+          <q-btn icon="keyboard_arrow_up" dense flat round @click="moveUp(props.row.index)" :disable="props.row.index === 0" />
+          <q-btn icon="keyboard_arrow_down" dense flat round @click="moveDown(props.row.index)" :disable="props.row.index === rows.length-1" />
+          <q-btn icon="edit" dense flat round @click="edit(props.row.index)" />
           <q-btn icon="delete" dense flat round @click="$refs.deleteDialog.show(props.row)" />
         </q-td>
       </template>
@@ -40,7 +42,7 @@
         </q-form>
       </q-card>
     </q-dialog>
-    <DeleteDialog :nameField="row => row.tag" :deleteCallback="delSize" ref="deleteDialog" />
+    <DeleteDialog :nameField="row => row.tag" :deleteCallback="del" ref="deleteDialog" />
   </div>
 </template>
 
@@ -64,7 +66,8 @@ export default {
   computed: {
     rows () {
       return this.$props.value ? this.$props.value.map((value, index) => ({ index, ...value })) : [];
-    }
+    },
+    defaultSize () { return this.$store.state.app.defaultSize; }
   },
   data () {
     return {
@@ -84,15 +87,29 @@ export default {
     }
   },
   methods: {
-    addSize () {
-      this.editee = { quality: 0.75, format: 'jpg' };
+    add () {
+      this.editee = JSON.parse(JSON.stringify(this.defaultSize));
       this.editIndex = -1;
     },
-    editSize (index) {      
+    edit (index) {      
       this.editee = JSON.parse(JSON.stringify(this.$props.value[index]));
       this.editIndex = index;
     },
-    async delSize (row) {
+    async moveUp(index) {
+      let list = [...this.$props.value];
+      let row = list[index];
+      list[index] = list[index-1];
+      list[index-1] = row;
+      return this.$props.saveCallback(list);
+    },
+    async moveDown(index) {
+      let list = [...this.$props.value];
+      let row = list[index];
+      list[index] = list[index+1];
+      list[index+1] = row;
+      return this.$props.saveCallback(list);
+    },
+    async del (row) {
       this.saving = true;
       try {
         let list = [...this.$props.value];

@@ -25,27 +25,11 @@ namespace Zwyssigly.ImageServer.Standalone.Management
             return result.AsActionResult();
         }
 
-        [HttpGet]
-        [Authorize(PermissionTypes.ConfigurationRead)]
-        public async Task<IActionResult> List()
-        {
-            var result = await _service.ListAsync();
-            return result.AsActionResult();
-        }
-
         [HttpPut("{galleryName}")]
         [Authorize(PermissionTypes.ConfigurationWrite)]
         public async Task<IActionResult> Put([FromRoute]string galleryName, [FromBody] ProcessingConfiguration config)
         {
-            var result = await _service.ConfigureAsync(galleryName, config);
-            return result.AsActionResult();
-        }
-
-        [HttpDelete("{galleryName}")]
-        [Authorize(PermissionTypes.ConfigurationWrite)]
-        public async Task<IActionResult> Delete([FromRoute] string galleryName)
-        {
-            var result = await _service.DeleteAsync(galleryName);
+            var result = await _service.SetAsync(galleryName, config);
             return result.AsActionResult();
         }
     }

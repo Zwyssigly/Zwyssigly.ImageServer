@@ -7,11 +7,12 @@
     </q-breadcrumbs>
     <div class="row q-my-md" v-if="image">
       <div class="col-auto q-pr-sm">
-        <q-img
-          :src="getSource(image)"
-          width="256px"
+        <Thumbnail
           class="shadow-1"
-          :style="{ backgroundColor: '#' + image.fillColor, minHeight: '100px' }"
+          style="minHeight:100px"
+          :gallery="$route.params.gid"
+          :value="thumbnail"
+          width="256px"
         />
       </div>
       <div class="col">
@@ -37,7 +38,7 @@
         </div>
       </div>
     </div>
-    <ThumbnailTable :value="image.sizes" :gallery="$route.params.gid" :image="$route.params.iid" />
+    <ThumbnailTable :gallery="$route.params.gid" :image="image" />
     <div class="row q-mt-sm">
       <q-space />
       <q-btn label="Replace" icon="camera_alt" @click="replace" :loading="uploading" class="q-mr-md" />
@@ -51,14 +52,16 @@
 import ThumbnailTable from 'components/ThumbnailTable';
 import DeleteDialog from 'components/DeleteDialog';
 import ColorSquare from 'components/ColorSquare';
+import Thumbnail from 'components/Thumbnail';
 import { getFile } from 'src/helpers';
 
 export default {
   name: 'PageImage',
-  components: { ThumbnailTable, DeleteDialog, ColorSquare },
+  components: { ThumbnailTable, Thumbnail, DeleteDialog, ColorSquare },
   data () {
     return {
       image: null,
+      thumbnail: null,
       uploading: false
     }
   },
@@ -67,50 +70,27 @@ export default {
   },
   methods: {
     async refresh() {
-      let response = await this.$axios.get(this.buildUrl());
-      this.image = response.data;
+      let gallery = this.$client.getGallery(this.$route.params.gid);
+      this.image = (await gallery.getImages([this.$route.params.iid]))[0];
+      this.thumbnail = (await gallery.resolveThumbnails([this.image.id], { minWidth: 256 }))[0];
     },
     async del() {
-      let response = await this.$axios.delete(this.buildUrl());      
+      await this.$client.getGallery(this.$route.params.gid).deleteImages([this.$route.params.iid]); 
       await this.$router.replace({ name: 'gallery', params: { id: this.$route.params.gid } });
     },
     async replace() {
       this.uploading = true;
       try {
         let file = await getFile();
-        let response = await this.$axios.put(
-          this.buildUrl(), 
-          file,
-          { headers: { 'Content-Type': file.type } }
-        );
-        console.log(this.response);
+        await this.$client.getGallery(this.$route.params.gid).replaceImage(this.$route.params.iid, file);
         await this.refresh();
       } finally {
         this.uploading = false;
       }
     },
-    buildUrl() {
-      return [
-        'images/',
-        encodeURIComponent(this.$route.params.gid),
-        '/',
-        encodeURIComponent(this.$route.params.iid)
-      ].join('');
-    },
     getSource (img) {
-      console.log(img);
-      return [
-        '/api/v1/thumbnails/',
-        this.$route.params.gid,
-        '/',
-        encodeURIComponent(img.id),
-        '/v',
-        encodeURIComponent(img.rowVersion),
-        '/',
-        encodeURIComponent(img.sizes[0].tag),
-        '.',
-        img.sizes[0].format
-      ].join('');
+      return this.$client.getGallery(this.$route.params.gid)
+        .getThumbnailDataUrl(img.id, img.sizes[0].tag, img.sizes[0].format, img.rowVersion);
     }
   }
 }

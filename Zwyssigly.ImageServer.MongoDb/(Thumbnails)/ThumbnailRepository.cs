@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Zwyssigly.Functional;
+using Zwyssigly.ImageServer.Thumbnails;
 
 namespace Zwyssigly.ImageServer.MongoDb
 {
@@ -19,7 +20,11 @@ namespace Zwyssigly.ImageServer.MongoDb
         {
             var snapshots = thumbnails.Select(t => new ThumbnailSnapshot
             {
-                Id = t.ThumbnailId.ToString(),
+                Id = new ThumbnailIdSnapshot
+                {
+                    ImageId = t.ThumbnailId.ImageId.ToByteArray(),
+                    Tag = t.ThumbnailId.Tag.ToString()
+                },
                 Data = t.Data,
             });
 
@@ -29,19 +34,19 @@ namespace Zwyssigly.ImageServer.MongoDb
 
         public async Task<Result<Thumbnail, Error>> Get(Name gallery, ThumbnailId id)
         {
-            var cursor = await _client.Thumbnails(gallery).FindAsync(s => s.Id == id.ToString()).ConfigureAwait(false);
+            var cursor = await _client.Thumbnails(gallery).FindAsync(s => s.Id.ImageId == id.ImageId.ToByteArray() && s.Id.Tag == id.Tag.ToString()).ConfigureAwait(false);
             var snapshot = await cursor.ToListAsync().ConfigureAwait(false);
 
             return snapshot.Count == 1
                 ? Result.Success<Thumbnail, Error>(new Thumbnail(
-                    thumbnailId: ThumbnailId.FromString(snapshot[0].Id).UnwrapOrThrow(),
+                    thumbnailId: new ThumbnailId(new Id(snapshot[0].Id.ImageId), Name.FromString(snapshot[0].Id.Tag).UnwrapOrThrow(), Option.None()),
                     data: snapshot[0].Data))
                 : Result.Failure<Thumbnail, Error>(ErrorCode.NoSuchRecord);            
         }
 
         public async Task<Result<Unit, Error>> Delete(Name gallery, IEnumerable<ThumbnailId> ids)
         {
-            var byteIds = ids.Select(id => id.ToString()).ToArray();
+            var byteIds = ids.Select(id => new ThumbnailIdSnapshot { ImageId = id.ImageId.ToByteArray(), Tag = id.Tag.ToString() }).ToArray();
 
             var filter = Builders<ThumbnailSnapshot>.Filter.In(x => x.Id, byteIds);
             var response = await _client.Thumbnails(gallery).DeleteManyAsync(filter);

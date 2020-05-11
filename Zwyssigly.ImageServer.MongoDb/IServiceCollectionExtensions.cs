@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zwyssigly.ImageServer.Configuration;
+using Zwyssigly.ImageServer.Images;
 using Zwyssigly.ImageServer.Security;
+using Zwyssigly.ImageServer.Thumbnails;
 
 namespace Zwyssigly.ImageServer.MongoDb
 {

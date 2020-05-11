@@ -1,0 +1,14 @@
+{
+  "name": "imageserver-client",
+  "version": "0.0.1",
+  "description": "Axios based client for image server",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zwyssigly",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "axios": "^0.19.2"
+  }
+}

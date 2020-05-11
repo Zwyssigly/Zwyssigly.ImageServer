@@ -8,6 +8,7 @@ using Zwyssigly.ImageServer.Images;
 using Zwyssigly.ImageServer.Processing;
 using Zwyssigly.ImageServer.Processing.ImageSharp;
 using Zwyssigly.ImageServer.Security;
+using Zwyssigly.ImageServer.Thumbnails;
 using Zwyssigly.ImageServer.Thumbnails.Disk;
 
 namespace Zwyssigly.ImageServer.Core
@@ -19,7 +20,11 @@ namespace Zwyssigly.ImageServer.Core
             collection.TryAddSingleton<IClock>(SystemClock.Instance);
 
             collection.AddSingleton<ImageUploadService>();
-            collection.AddSingleton<IImageFactory, ImageSharpFactory>();
+            collection.AddSingleton<ThumbnailResolver>();
+
+            collection.AddSingleton<IImageFactory, ImageFactory>();
+            collection.AddSingleton<IImageProcessorFactory, ImageSharpProcessorFactory>();
+
             collection.AddSingleton<IConfigurationStorage, ConfigurationCache>();
             collection.AddSingleton<ISecurityConfigurationStorage, SecurityConfigurationCache>();
 

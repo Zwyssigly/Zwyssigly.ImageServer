@@ -1,63 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Zwyssigly.Functional;
 using Zwyssigly.ImageServer.Configuration;
 using Zwyssigly.ImageServer.Contracts;
-using Zwyssigly.ImageServer.Security;
 
 namespace Zwyssigly.ImageServer.Embedded
 {
     class EmbeddedConfigurationService : IConfigurationService
     {
         private readonly IConfigurationStorage _storage;
-        private readonly IImageRepository _imageRepository;
-        private readonly IThumbnailRepository _thumbnailRepository;
-        private readonly ISecurityConfigurationStorage _securityStorage;
 
-        public EmbeddedConfigurationService(
-            IConfigurationStorage storage,
-            IImageRepository imageRepository,
-            IThumbnailRepository thumbnailRepository,
-            ISecurityConfigurationStorage securityStorage)
+        public EmbeddedConfigurationService(IConfigurationStorage storage)
         {
             _storage = storage;
-            _imageRepository = imageRepository;
-            _thumbnailRepository = thumbnailRepository;
-            _securityStorage = securityStorage;
         }
 
-        public async Task<Result<Unit, Contracts.Error>> ConfigureAsync(string gallery, Contracts.ProcessingConfiguration configuration)
+        public async Task<Result<Unit, Contracts.Error>> SetAsync(string gallery, Contracts.ProcessingConfiguration configuration)
         {
-            var result = await _storage.Persist(Name.FromString(gallery).UnwrapOrThrow(), FromContract(configuration));
-            return result.MapFailure(ErrorExtensions.ToContract);
-        }
-
-        public async Task<Result<Unit, Contracts.Error>> DeleteAsync(string gallery)
-        {
-            var galleryName = Name.FromString(gallery).UnwrapOrThrow();
-
-            var result = await _imageRepository.Truncate(galleryName)
-                .AndThenAsync(_ => _thumbnailRepository.Truncate(galleryName))
-                .AndThenAsync(_ => _storage.Delete(galleryName))
-                .AndThenAsync(_ => _securityStorage.Delete(galleryName));
-
+            var result = await Name.FromString(gallery)
+                .AndThenAsync(name => FromContract(configuration)
+                .AndThenAsync(config => _storage.Persist(name, config)));
+            
             return result.MapFailure(ErrorExtensions.ToContract);
         }
 
         public async Task<Result<Contracts.ProcessingConfiguration, Contracts.Error>> GetAsync(string gallery)
         {
-            var result = await _storage.Get(Name.FromString(gallery).UnwrapOrThrow());
+            var result = await Name.FromString(gallery).AndThenAsync(name => _storage.Get(name));
             return result.Map(ToContract, ErrorExtensions.ToContract);
-        }
-
-        public async Task<Result<IReadOnlyCollection<string>, Contracts.Error>> ListAsync()
-        {
-            var result = await _storage.List();
-            return result.Map(
-                s => (IReadOnlyCollection<string>) s.Select(g => g.ToString()).ToArray(),
-                ErrorExtensions.ToContract);
         }
 
         private static Contracts.ProcessingConfiguration ToContract(Configuration.ProcessingConfiguration config)
@@ -79,26 +50,43 @@ namespace Zwyssigly.ImageServer.Embedded
             );
         }
 
-        private static Configuration.ProcessingConfiguration FromContract(Contracts.ProcessingConfiguration value)
+        private static Result<Configuration.ProcessingConfiguration, Error> FromContract(Contracts.ProcessingConfiguration value)
         {
-            return Configuration.ProcessingConfiguration.New(
+            var sizesResult = value.Sizes.Select(s =>
+            {
+                var cropResult = Result.Success<Option<Configuration.CropConfiguration>, Error>(Option.None());
+                if (s.Crop != null)
+                {
+                    if (Enum.TryParse<CropStrategy>(s.Crop.CropStrategy, true, out var strategy))
+                    {
+                        var colorResult = Result.Success<Option<Color>, Error>(Option.None());
+                        if (s.Crop.Color != null)
+                            colorResult = Color.FromString(s.Crop.Color).MapSuccess(c => Option.Some(c));
+
+                        cropResult = colorResult.AndThen(color => AspectRatio.FromString(s.Crop.AspectRatio)
+                            .MapSuccess(ratio => Option.Some(new Configuration.CropConfiguration(ratio, strategy, color))));
+                    }
+                    else cropResult = Result.Failure(Error.ValidationError($"Unknown crop strategy {s.Crop.CropStrategy}"));
+                }
+
+                return cropResult
+                    .AndThen(crop => Name.FromString(s.Tag)
+                    .AndThen(tag => Quality.FromScalar(s.Quality)
+                    .AndThen(quality => ImageFormat.FromExtension(s.Format)
+                    .MapSuccess(format => new Configuration.SizeConfiguration(
+                        tag,
+                        s.MaxWidth.ToOption(),
+                        s.MaxHeight.ToOption(),
+                        crop,
+                        quality,
+                        format)))));
+
+            }).Railway();
+
+            return sizesResult.AndThen(sizes => Configuration.ProcessingConfiguration.New(
                 value.AvoidDuplicates,
-                value.Sizes.Select(s => new Configuration.SizeConfiguration(
-                    Name.FromString(s.Tag).UnwrapOrThrow(),
-                    s.MaxWidth.ToOption(),
-                    s.MaxHeight.ToOption(),
-                    s.Crop != null
-                        ? Option.Some(new Configuration.CropConfiguration(
-                            AspectRatio.FromString(s.Crop.AspectRatio).UnwrapOrThrow(),
-                            (CropStrategy)Enum.Parse(typeof(CropStrategy), s.Crop.CropStrategy, true),
-                            s.Crop.Color != null
-                                ? Option.Some(Color.FromString(s.Crop.Color).UnwrapOrThrow())
-                                : Option.None()
-                        )) : Option.None(),
-                    Quality.FromScalar(s.Quality).UnwrapOrThrow(),
-                    ImageFormat.FromExtension(s.Format).UnwrapOrThrow()
-                )).ToArray()
-            ).UnwrapOrThrow();
+                sizes
+            ));
         }
     }
 }

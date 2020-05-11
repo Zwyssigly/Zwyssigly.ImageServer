@@ -14,14 +14,12 @@
       @input="val => emitValue({ name: val })"
       :disable="value.type==='Anonymous'"
     />
-    <q-input 
-      label="Password"
+    <PasswordInput 
       :value="value.password"
       @input="val => emitValue({ password: val })"
       :disable="value.type==='Anonymous'"
-      type="password"
     />
-    <div class="text-label">Permissions: </div>
+    <div class="text-label q-mt-sm">Permissions: </div>
     <q-option-group
       :value="value.permissions"
       @input="val => emitValue({ permissions: val })"
@@ -33,17 +31,15 @@
 </template>
 
 <script>
+import PasswordInput from 'components/PasswordInput';
+
 export default {
   name: 'AccountForm',
+  components: { PasswordInput },
   props: {
     value: {
       type: Object,
-      default: () => ({
-        type: 'Basic',
-        name: null,
-        permissions: [],
-        password: null,
-      })
+      required: true
     }
   },
   data () {
@@ -54,6 +50,7 @@ export default {
         { label: "image:write", value: 'image:write' },
         { label: "configuration:read", value: 'configuration:read' },
         { label: "configuration:write", value: 'configuration:write' },
+        { label: "gallery", value: 'gallery' },
         { label: "security", value: 'security' },
       ]
     }

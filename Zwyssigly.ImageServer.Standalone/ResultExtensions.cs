@@ -14,11 +14,13 @@ namespace Zwyssigly.ImageServer.Standalone
 
         public static IActionResult AsActionResult(this Contracts.Error failure)
         {
+           var obj = failure.Message.Match<object>(m => new { code = failure.Code.ToString(), message = m }, () => new { code = failure.Code.ToString() });
+
             return failure.Code switch
             {
-                Contracts.ErrorCode.NoSuchRecord => failure.Message.Match<IActionResult>(m => new NotFoundObjectResult(m), () => new NotFoundResult()),
-                Contracts.ErrorCode.ValidationError => failure.Message.Match<IActionResult>(m => new BadRequestObjectResult(failure.Message), () => new BadRequestResult()),
-                _ => failure.Message.Match<IActionResult>(m => new ObjectResult(m) { StatusCode = 500 }, () => new StatusCodeResult(500))
+                Contracts.ErrorCode.NoSuchRecord => new NotFoundObjectResult(obj),
+                Contracts.ErrorCode.ValidationError => new BadRequestObjectResult(obj),
+                _ => new ObjectResult(obj) { StatusCode = 500 }
             };
         }
     }

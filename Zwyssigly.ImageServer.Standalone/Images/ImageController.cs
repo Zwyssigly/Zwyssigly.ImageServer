@@ -46,12 +46,12 @@ namespace Zwyssigly.ImageServer.Standalone.Images
             return result.AsActionResult();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{ids}")]
         [Authorize(PermissionTypes.ImageRead)]
-        public async Task<IActionResult> Get([FromRoute] string galleryName, [FromRoute] string id)
+        public async Task<IActionResult> Get([FromRoute] string galleryName, [FromRoute] string ids)
         {
-            var result = await _imageService.GetAsync(galleryName, new[] { id });
-            return result.MapSuccess(i => i.Single()).AsActionResult();
+            var result = await _imageService.GetAsync(galleryName, FromRouteArray.Parse(ids));
+            return result.AsActionResult();
         }
 
         [HttpGet]
@@ -62,11 +62,11 @@ namespace Zwyssigly.ImageServer.Standalone.Images
             return result.AsActionResult();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{ids}")]
         [Authorize(PermissionTypes.ImageWrite)]
-        public async Task<IActionResult> Delete([FromRoute] string galleryName, [FromRoute] string id)
+        public async Task<IActionResult> Delete([FromRoute] string galleryName, [FromRoute] string ids)
         {
-            var result = await _imageService.DeleteAsync(galleryName, new[] { id });
+            var result = await _imageService.DeleteAsync(galleryName, FromRouteArray.Parse(ids));
             return result.AsActionResult();
         }
     }

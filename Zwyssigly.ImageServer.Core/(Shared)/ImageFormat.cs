@@ -8,7 +8,7 @@ namespace Zwyssigly.ImageServer
         public static readonly ImageFormat Jpeg = new ImageFormat("jpg", "image/jpeg", new ValueObjectSet<string>("jpeg", "jpg"));
         public static readonly ImageFormat Png = new ImageFormat("png", "image/png", new ValueObjectSet<string>("png"));
 
-        public static Result<ImageFormat, string> FromExtension(string ext)
+        public static Result<ImageFormat, Error> FromExtension(string ext)
         {
             ext = ext.ToLower();
 
@@ -18,7 +18,7 @@ namespace Zwyssigly.ImageServer
             if (Png.FileExtensions.Contains(ext))
                 return Result.Success(Png);
 
-            return Result.Failure($"Unkown file extension '{ext}'");
+            return Result.Failure(Error.ValidationError($"Unkown file extension '{ext}'"));
         }
 
         public static Result<ImageFormat, string> FromMimeType(string mimeType)

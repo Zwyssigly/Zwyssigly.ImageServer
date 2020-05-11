@@ -9,12 +9,12 @@ namespace Zwyssigly.ImageServer
 
         private readonly uint _value;
 
-        public static Result<Color, string> FromString(string value)
+        public static Result<Color, Error> FromString(string value)
         {
             if (value.Length == 6 && uint.TryParse(value, System.Globalization.NumberStyles.HexNumber, null, out var number))
                 return Result.Success(new Color(number));
 
-            return Result.Failure("Color expect as hex, e.g.: ff00ff");
+            return Result.Failure(Error.ValidationError("Color expect as hex, e.g.: ff00ff"));
         }
 
         public Color(uint value)

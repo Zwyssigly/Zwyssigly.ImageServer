@@ -6,6 +6,18 @@ namespace Zwyssigly.ImageServer.Configuration
 {
     public class ProcessingConfiguration
     {
+        public static readonly ProcessingConfiguration Default = ProcessingConfiguration.New(avoidDuplicates: true, sizes: new[]
+        {
+            new SizeConfiguration(
+                Name.FromString("original").UnwrapOrThrow(),
+                Option.None(),
+                Option.None(),
+                Option.None(),
+                Quality.FromScalar(0.75f).UnwrapOrThrow(),
+                ImageFormat.Jpeg
+            )
+        }).UnwrapOrThrow();
+
         public bool AvoidDuplicates { get; }
         public IReadOnlyCollection<SizeConfiguration> Sizes { get; }
 

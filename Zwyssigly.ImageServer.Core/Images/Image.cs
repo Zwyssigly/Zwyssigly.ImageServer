@@ -22,7 +22,7 @@ namespace Zwyssigly.ImageServer
 
         public IReadOnlyCollection<ImageSize> Sizes { get; }
 
-        public IReadOnlyCollection<ThumbnailId> ThumbnailIds => Sizes.Select(s => new ThumbnailId(Id, s.Tag)).ToArray();
+        public IReadOnlyCollection<ThumbnailId> ThumbnailIds => Sizes.Select(s => new ThumbnailId(Id, s.Tag, Option.Some(s.ImageFormat))).ToArray();
 
         public static Result<Image, Error> New(Id id, uint rowVersion, Instant uploadedAt, Option<byte[]> meta, Color fillColor, Color edgeColor, Md5 md5, IReadOnlyCollection<ImageSize> sizes)
         {

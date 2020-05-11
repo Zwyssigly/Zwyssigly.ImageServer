@@ -13,6 +13,7 @@ namespace Zwyssigly.ImageServer.Security
         public const string ConfigurationRead = "configuration:read";
         public const string ConfigurationWrite = "configuration:write";
         public const string Security = "security";
+        public const string Gallery = "gallery";
     }
 
     public class Permission : SimpleValueObject<Permission>
@@ -23,6 +24,8 @@ namespace Zwyssigly.ImageServer.Security
         public static readonly Permission ConfigurationRead =  new Permission(PermissionTypes.ConfigurationRead);
         public static readonly Permission ConfigurationWrite =  new Permission(PermissionTypes.ConfigurationWrite);
         public static readonly Permission Security =  new Permission(PermissionTypes.Security);
+        public static readonly Permission Gallery = new Permission(PermissionTypes.Gallery);
+
 
         public static readonly IReadOnlyCollection<Permission> All = new[]
         {
@@ -31,7 +34,8 @@ namespace Zwyssigly.ImageServer.Security
             ImageWrite,
             ConfigurationRead,
             ConfigurationWrite,
-            Security
+            Security,
+            Gallery
         };
 
         private static readonly IReadOnlyDictionary<string, Permission> _lookup = All.ToDictionary(p => p.ToString());

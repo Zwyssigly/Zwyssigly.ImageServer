@@ -15,6 +15,7 @@ namespace Zwyssigly.ImageServer.Embedded
             collection.AddSingleton<IImageService, EmbeddedImageService>();
             collection.AddSingleton<IThumbnailService, EmbeddedThumbnailService>();
             collection.AddSingleton<ISecurityService, EmbeddedSecurityService>();
+            collection.AddSingleton<IGalleryService, EmbeddedGalleryService>();
         }
     }
 }

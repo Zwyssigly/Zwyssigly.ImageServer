@@ -29,12 +29,10 @@
     <q-separator />
     <q-tab-panels v-model="tab" animated>
       <q-tab-panel name="security">
-        <SecurityForm :endpoint="'security/' + $route.params.id" />
+        <SecurityForm :gallery="$route.params.id" />
       </q-tab-panel>
       <q-tab-panel name="configuration">
-        <SizeTable
-          :value="configuration && configuration.sizes"
-          :saveCallback="saveSizes" />
+        <ConfigurationForm :gallery="$route.params.id" />
       </q-tab-panel>
       <q-tab-panel name="images">
         <ImageGutter :gallery="$route.params.id" ref="images" />
@@ -45,7 +43,7 @@
 </template>
 
 <script>
-import SizeTable from 'components/SizeTable';
+import ConfigurationForm from 'components/ConfigurationForm';
 import ImageGutter from 'components/ImageGutter';
 import DeleteDialog from 'components/DeleteDialog';
 import SecurityForm from 'components/SecurityForm';
@@ -53,10 +51,9 @@ import { getFile } from 'src/helpers';
 
 export default {
   name: 'PageGallery',
-  components: { SizeTable, ImageGutter, DeleteDialog, SecurityForm },
+  components: { ConfigurationForm, ImageGutter, DeleteDialog, SecurityForm },
   data () {
     return {
-      configuration: null,
       tab: 'security',
       uploading: false
     }
@@ -64,23 +61,11 @@ export default {
   computed: {
     id () { return this.$route.params.id; }
   },
-  async mounted () {
-    await this.refresh();
-  },
   methods: {
-    async saveSizes(sizes) {
-      let response = await this.$axios.put('configurations/' + this.$route.params.id, { ...this.configuration, sizes });
-      console.log(response);
-      await this.refresh();
-    },
-    async refresh() {
-      let response = await this.$axios.get('configurations/' + this.$route.params.id);
-      this.configuration = response.data;
-    },
     async del () {
-      let response = await this.$axios.delete('configurations/' + this.$route.params.id);
+      let response = await this.$client.deleteGallery(this.$route.params.id);
       console.log(response);
-      await this.$store.dispatch('app/refreshGalleries');
+      await this.$store.dispatch('app/refreshGalleries', this.$client);
       await this.$router.replace({ name: 'index' });
     },
     async upload () {
@@ -88,11 +73,7 @@ export default {
       try {
         let file = await getFile();
         console.log(file);
-        let response = await this.$axios.post(
-          'images/' + this.$route.params.id, 
-          file,
-          { headers: { 'Content-Type': file.type } }
-        );
+        let response = await this.$client.getGallery(this.$route.params.id).uploadImage(file);
         console.log(this.response);
         await this.$refs.images.refresh();
       } finally {

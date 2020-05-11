@@ -17,21 +17,24 @@ namespace Zwyssigly.ImageServer.Embedded
             _storage = storage;
         }
 
-        public async Task<Result<Unit, Contracts.Error>> ConfigureAsync(string galleryName, Contracts.SecurityConfiguration configuration)
+        public async Task<Result<Unit, Contracts.Error>> SetAsync(string galleryName, Contracts.SecurityConfiguration configuration)
         {
-            var result = await _storage.Persist(Name.FromString(galleryName).UnwrapOrThrow(), ToConfiguration(configuration));
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(gallery => ToConfiguration(configuration)
+                .AndThenAsync(config => _storage.Persist(gallery, config)));
+            
             return result.MapFailure(ErrorExtensions.ToContract);
         }
 
-        public async Task<Result<Unit, Contracts.Error>> ConfigureGlobalAsync(Contracts.SecurityConfiguration configuration)
+        public async Task<Result<Unit, Contracts.Error>> SetGlobalAsync(Contracts.SecurityConfiguration configuration)
         {
-            var result = await _storage.PersistGlobal(ToConfiguration(configuration));
+            var result = await ToConfiguration(configuration).AndThenAsync(config => _storage.PersistGlobal(config));
             return result.MapFailure(ErrorExtensions.ToContract);
         }
 
         public async Task<Result<Contracts.SecurityConfiguration, Contracts.Error>> GetAsync(string galleryName)
         {
-            var config = await _storage.Get(Name.FromString(galleryName).UnwrapOrThrow());
+            var config = await Name.FromString(galleryName).AndThenAsync(name => _storage.Get(name));
             return config.Map(ToModel, ErrorExtensions.ToContract);
         }
 
@@ -41,23 +44,26 @@ namespace Zwyssigly.ImageServer.Embedded
             return config.Map(ToModel, ErrorExtensions.ToContract);
         }
 
-
-        public async Task<Result<Unit, Contracts.Error>> DeleteAsync(string galleryName)
+        private Result<Security.SecurityConfiguration, Error> ToConfiguration(Contracts.SecurityConfiguration model)
         {
-            var result = await _storage.Delete(Name.FromString(galleryName).UnwrapOrThrow());
-            return result.MapFailure(ErrorExtensions.ToContract);
-        }
+            var accountsResult = model.Accounts.Select(a =>
+            {
+                if (!Enum.TryParse<AccountType>(a.Type, true, out var type))
+                    return Result.Failure<Security.AccountConfiguration, Error>(Error.ValidationError($"Unknown account type {a.Type}"));
 
-        private Security.SecurityConfiguration ToConfiguration(Contracts.SecurityConfiguration model)
-        {
-            return Security.SecurityConfiguration.New(
-                accounts: model.Accounts.Select(a => Security.AccountConfiguration.New(
-                    name: Name.FromString(a.Name).UnwrapOrThrow(),
-                    type: (AccountType)Enum.Parse(typeof(AccountType), a.Type, true),
-                    password: a.Password?.Length > 0 ? Option.Some(a.Password) : Option.None(),
-                    permissions: a.Permissions.Select(r => Permission.FromString(r).UnwrapOrThrow()).ToValueObjectSet()
-                ).UnwrapOrThrow()).ToArray()
-            ).UnwrapOrThrow();
+                var permissionResults = a.Permissions.Select(Permission.FromString).ToArray();
+                if (permissionResults.Any(r => r.IsFailure))
+                    return Result.Failure(permissionResults.SelectFailure().First());
+
+                return Name.FromString(a.Name).AndThen(name => Security.AccountConfiguration.New(
+                    name,
+                    type,
+                    a.Password?.Length > 0 ? Option.Some(a.Password) : Option.None(),
+                    permissionResults.SelectSuccess().ToValueObjectSet()));
+
+            }).Railway();
+
+            return accountsResult.AndThen(accounts => Security.SecurityConfiguration.New(accounts));
         }
 
         private Contracts.SecurityConfiguration ToModel(Security.SecurityConfiguration configuration)

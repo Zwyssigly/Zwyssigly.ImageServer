@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Zwyssigly.Functional;
 using Zwyssigly.ImageServer.Contracts;
 using Zwyssigly.ImageServer.Security;
 
@@ -17,16 +18,26 @@ namespace Zwyssigly.ImageServer.Standalone.Thumbnails
             _thumbnailService = thumbnailService;
         }
 
+        [HttpGet()]
+        [Authorize(PermissionTypes.ThumbnailRead)]
+        public async Task<IActionResult> Get([FromRoute] string galleryName, [FromRoute] string imageId, [FromQuery] string? tag, [FromQuery] ushort? minWidth, [FromQuery] ushort? minHeight)
+        {
+            var result = await _thumbnailService.ResolveAsync(galleryName, FromRouteArray.Parse(imageId), new ResolveOptions { Tag = tag, MinWidth = minWidth, MinHeight = minHeight });
+            return result.AsActionResult();
+        }
+
         [HttpGet("{tag}.{ext}")]
         [Authorize(PermissionTypes.ThumbnailRead)]
         public async Task<IActionResult> Get([FromRoute] string galleryName, [FromRoute] string imageId, [FromRoute] string tag, [FromRoute] string ext)
         {
-            var format = ImageFormat.FromExtension(ext).UnwrapOrThrow();
-
-            var result = await _thumbnailService.GetAsync(galleryName, imageId, tag);
+            var result = await _thumbnailService.GetAsync(galleryName, imageId, tag, ext);
 
             return result.Match(
-                thumbnail => new FileContentResult(thumbnail, format.MimeType),
+                thumbnail =>
+                {
+                    var format = ImageFormat.FromExtension(ext).UnwrapOrThrow();
+                    return new FileContentResult(thumbnail, format.MimeType);
+                },
                 failure => failure.AsActionResult()
             );
         }

@@ -18,20 +18,20 @@ namespace Zwyssigly.ImageServer
         private readonly ushort _width;
         private readonly ushort _height;
 
-        public static Result<AspectRatio, string> FromString(string raw)
+        public static Result<AspectRatio, Error> FromString(string raw)
         {
             if (string.IsNullOrEmpty(raw))
-                return Result.Failure("Can not create aspect ratio from empty string");
+                return Result.Failure(Error.ValidationError("Can not create aspect ratio from empty string"));
 
             var parts = raw.Split(':');
             if (parts.Length != 2)
-                return Result.Failure("Format 16:9 expected");
+                return Result.Failure(Error.ValidationError("Format 16:9 expected"));
 
             if (!int.TryParse(parts[0], out var w))
-                return Result.Failure("Format 16:9 expected");
+                return Result.Failure(Error.ValidationError("Format 16:9 expected"));
 
             if (!int.TryParse(parts[1], out var h))
-                return Result.Failure("Format 16:9 expected");
+                return Result.Failure(Error.ValidationError("Format 16:9 expected"));
 
             return FromScalar(w, h);
         }
@@ -56,12 +56,12 @@ namespace Zwyssigly.ImageServer
                 .UnwrapOrThrow();
         }
 
-        public static Result<AspectRatio, string> FromScalar(int width, int height)
+        public static Result<AspectRatio, Error> FromScalar(int width, int height)
         {
             if (width <= 0 || width > ushort.MaxValue)
-                return Result.Failure($"Width must be between 0 and {ushort.MaxValue}");
+                return Result.Failure(Error.ValidationError($"Width must be between 0 and {ushort.MaxValue}"));
             if (height <= 0 || height > ushort.MaxValue)
-                return Result.Failure($"Height must be between 0 and {ushort.MaxValue}");
+                return Result.Failure(Error.ValidationError($"Height must be between 0 and {ushort.MaxValue}"));
 
             return Result.Success(new AspectRatio((ushort)width, (ushort)height));
         }

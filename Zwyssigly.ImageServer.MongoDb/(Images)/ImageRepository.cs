@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Zwyssigly.Functional;
+using Zwyssigly.ImageServer.Images;
 
 namespace Zwyssigly.ImageServer.MongoDb
 {
@@ -66,7 +67,9 @@ namespace Zwyssigly.ImageServer.MongoDb
                     Resolution.FromScalar(t.Width, t.Height).UnwrapOrThrow(),
                     AspectRatio.FromString(t.AspectRatio).UnwrapOrThrow(),
                     t.CropStrategy != null ? Option.Some((CropStrategy)Enum.Parse(typeof(CropStrategy), t.CropStrategy, true)) : Option.None(),
-                    ImageFormat.FromExtension(t.ImageFormat).UnwrapOrThrow()
+                    ImageFormat.FromExtension(t.ImageFormat).UnwrapOrThrow(),
+                    Quality.FromScalar(t.Quality).UnwrapOrThrow(),
+                    t.DuplicateOf != null ? Option.Some(Name.FromString(t.DuplicateOf).UnwrapOrThrow()) : Option.None()
                 )).ToArray()
             ).UnwrapOrThrow();
         }
@@ -108,7 +111,9 @@ namespace Zwyssigly.ImageServer.MongoDb
                     Height = t.Resolution.Height,
                     AspectRatio = t.AspectRatio.ToString(),
                     ImageFormat = t.ImageFormat.FileExtension,
-                    CropStrategy = t.CropStrategy.Map(f => f.ToString()).UnwrapOrDefault()
+                    CropStrategy = t.CropStrategy.Map(f => f.ToString()).UnwrapOrDefault(),
+                    Quality = t.Quality.ToScaler(),
+                    DuplicateOf = t.DuplicateOf.Map(d => d.ToString()).UnwrapOrDefault()
                 }).ToArray()
             };
         }

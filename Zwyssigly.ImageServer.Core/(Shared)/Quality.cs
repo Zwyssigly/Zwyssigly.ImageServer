@@ -8,10 +8,10 @@ namespace Zwyssigly.ImageServer
 {
     public class Quality : SimpleValueObject<Quality>
     {
-        public static Result<Quality, string> FromScalar(float value)
+        public static Result<Quality, Error> FromScalar(float value)
         {
             if (value <= 0f || value > 1f)
-                return Result.Failure("Quality must be between 0.0 and 1.0");
+                return Result.Failure(Error.ValidationError("Quality must be between 0.0 and 1.0"));
 
             return Result.Success(new Quality(value));
         }

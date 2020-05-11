@@ -4,7 +4,7 @@
       <div class="text-h5 col-auto q-mr-sm">Security</div>
       <div class="text-caption col-auto">(applies to all galleries)</div>
     </div>
-    <SecurityForm endpoint="security-global"></SecurityForm>
+    <SecurityForm></SecurityForm>
   </q-page>
 </template>
 

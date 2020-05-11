@@ -1,8 +1,6 @@
-import axios from 'axios'
-
-export async function refreshGalleries (context) {
+export async function refreshGalleries (context, client) {
   context.commit('startRefresh');
-  var response = await axios.get('configurations');
-  context.commit('endRefresh', response.data);
+  var galleries = await client.listGalleries();
+  context.commit('endRefresh', galleries);
 }
 

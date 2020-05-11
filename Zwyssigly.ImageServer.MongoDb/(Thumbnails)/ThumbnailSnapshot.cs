@@ -5,9 +5,18 @@ namespace Zwyssigly.ImageServer.MongoDb
     internal class ThumbnailSnapshot
     {
         [BsonId]
-        public string Id { get; set; }
+        public ThumbnailIdSnapshot Id { get; set; }
 
         [BsonElement("bin")]
         public byte[] Data { get; set; }
+    }
+
+    internal class ThumbnailIdSnapshot
+    {
+        [BsonElement("id")]
+        public byte[] ImageId { get; set; }
+
+        [BsonElement("t")]
+        public string Tag { get; set; }
     }
 }

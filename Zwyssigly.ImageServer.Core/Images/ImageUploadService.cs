@@ -7,6 +7,7 @@ using Zwyssigly.Functional;
 using Zwyssigly.ImageServer.Configuration;
 using Zwyssigly.ImageServer.Core;
 using Zwyssigly.ImageServer.Processing;
+using Zwyssigly.ImageServer.Thumbnails;
 
 namespace Zwyssigly.ImageServer.Images
 {

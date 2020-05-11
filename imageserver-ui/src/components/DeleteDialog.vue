@@ -9,7 +9,7 @@
         <q-btn icon="cancel" label="Abort" :disable="working" color="secondary" v-close-popup />
         <q-btn icon="delete_forever" color="negative" :loading="working" @click="doWork">
           Delete
-          <q-spinner-ball slot="loading" />
+          <q-spinner slot="loading" />
         </q-btn>
       </q-card-actions>
     </q-card>

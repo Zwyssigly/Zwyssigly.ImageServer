@@ -1,4 +1,4 @@
-<template>
+<template style="width:100%">
   <AccountTable 
     :value="configuration && configuration.accounts"
     :saveCallback="saveAccounts"
@@ -12,7 +12,7 @@ export default {
   name: 'SecurityForm',
   components: { AccountTable },
   props: {
-    endpoint: String
+    gallery: String
   },
   data () {
     return { configuration: null };
@@ -21,19 +21,24 @@ export default {
     await this.refresh();
   },
   methods: {
-    async saveAccounts(accounts) {
-      let response = await this.$axios.put(this.$props.endpoint, { ...this.configuration, accounts });
+    saveAccounts(accounts) {
+      return this.save({ accounts });
+    },
+    async save(configuration) {
+      let promise = this.$props.gallery
+        ? this.$client.getGallery(this.$props.gallery).setSecurity({ ...this.configuration, ...configuration })
+        : this.$client.setSecurity({ ...this.configuration, ...configuration });
+
+      let response = await promise;
       console.log(response);
       await this.refresh();
     },
-    refresh() {
-      return this.$axios.get(this.$props.endpoint).then(resp => {
-        this.configuration = resp.data;
-      }).catch(error => {
-        if (error.response.status === 404)
-          this.configuration = { accounts: [] };
-        return Promise.reject(error);
-      });
+    async refresh() {
+      let promise = this.$props.gallery
+        ? this.$client.getGallery(this.$props.gallery).getSecurity()
+        : this.$client.getSecurity();
+
+      this.configuration = await promise;
     }
   }
 }

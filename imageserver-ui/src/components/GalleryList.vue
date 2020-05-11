@@ -37,16 +37,14 @@ export default {
   },
   computed: {
     galleries () { return this.$store.state.app.galleries; }, 
-    loading () { return this.$store.state.app.galleries_loading; }
+    loading () { return this.$store.state.app.galleries_loading; },
+    defaultConfiguration () { return this.$store.state.app.defaultConfiguration; }
   },
   methods: {
     async createGallery (name) {
-      var response = await this.$axios.put('configurations/' + name, {
-        name,
-        sizes: []
-      });
+      var response = await this.$client.newGallery(name);
       console.log(response);
-      await this.$store.dispatch('app/refreshGalleries');
+      await this.$store.dispatch('app/refreshGalleries', this.$client);
       await this.$router.push({ name: 'gallery', params: { id: name }});
     }
   }

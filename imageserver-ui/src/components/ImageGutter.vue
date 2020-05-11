@@ -20,20 +20,12 @@
       />
     </div>  
     <div class="row q-col-gutter-md q-my-sm">
-      <div class="col-xs-6 col-sm-4 col-md-3" v-for="image in images" :key="image.id">
+      <div class="col-xs-6 col-sm-4 col-md-3" v-for="thumbnail in thumbnails" :key="thumbnail.id">
         <q-card 
           class="cursor-pointer"
-          @click="$router.push({ name: 'image', params: { gid: $route.params.id, iid: image.id } })"
+          @click="$router.push({ name: 'image', params: { gid: $route.params.id, iid: thumbnail.id } })"
         >
-          <q-img
-            :src="getSource(image)"
-            ratio="1"
-            :style="{ backgroundColor: '#' + image.fillColor }"
-          >
-            <div class="absolute-bottom text-caption row">
-              <span class="id">{{image.id}}</span>
-            </div>
-          </q-img>
+          <Thumbnail ratio="1" :value="thumbnail" label :gallery="$props.gallery" />          
         </q-card>
       </div>
     </div>
@@ -51,15 +43,18 @@
 </template>
 
 <script>
+import Thumbnail from 'components/Thumbnail';
+
 const pageSize = 12;
 
 export default {
   name: 'ImageGutter',
+  components: { Thumbnail },
   data () {
     return {
       currentPage: 1,
       totalPages: 1,
-      images: []
+      thumbnails: []
     }
   },
   props: {
@@ -69,26 +64,17 @@ export default {
     await this.loadPage(1);
   },
   methods: {
-    async loadPage (page) {
-      let response = await this.$axios('images/' + this.$props.gallery + '?skip=' + (page-1)*pageSize + '&take=' + pageSize);
-      this.totalPages = Math.ceil(response.data.totalItems/pageSize);
-      this.currentPage = page;
-      this.images = response.data.items;
+    async loadPage (currentPage) {
+      let page = await this.$client.getGallery(this.$props.gallery).listImages((currentPage-1)*pageSize, pageSize);
+
+      this.totalPages = Math.ceil(page.totalItems/pageSize);
+      this.currentPage = currentPage;
+
+      let ids = page.items.map(i => i.id);
+      this.thumbnails = await this.$client.getGallery(this.$props.gallery).resolveThumbnails(ids, { minWidth: 256, minHeight: 256 });
     },
     refresh() {
       return this.loadPage(this.currentPage);
-    },
-    getSource (img) {
-      return [
-        '/api/v1/thumbnails/',
-        this.$route.params.id,
-        '/',
-        encodeURIComponent(img.id),
-        '/',
-        encodeURIComponent(img.sizes[0].tag),
-        '.',
-        img.sizes[0].format
-      ].join('');
     }
   }
 }

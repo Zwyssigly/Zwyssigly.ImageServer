@@ -74,7 +74,8 @@ export default {
   computed: {
     rows () {
       return this.$props.value ? this.$props.value.map((value, index) => ({ index, ...value })) : [];
-    }
+    },
+    defaultAccount () { return this.$store.state.app.defaultAccount; }
   },
   data () {
     return {
@@ -92,12 +93,7 @@ export default {
   },
   methods: {
     addAccount () {
-      this.editee = { 
-        type: 'Basic', 
-        name: 'New-user',
-        permissions: ['thumbnail:read'],
-        password: null,
-      };
+      this.editee = JSON.parse(JSON.stringify(this.defaultAccount));
       this.editIndex = -1;
     },
     editAccount (index) {      

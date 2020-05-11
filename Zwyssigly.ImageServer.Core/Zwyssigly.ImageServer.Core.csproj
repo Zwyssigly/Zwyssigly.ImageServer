@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.3" />
     <PackageReference Include="NodaTime" Version="2.4.8" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
-    <PackageReference Include="Zwyssigly.Functional" Version="0.1.4" />
+    <PackageReference Include="Zwyssigly.Functional" Version="0.1.6" />
     <PackageReference Include="Zwyssigly.ValueObjects" Version="0.0.1" />
   </ItemGroup>
 

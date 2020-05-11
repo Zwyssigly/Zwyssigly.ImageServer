@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Image Server UI
+          Image Server
         </q-toolbar-title>
 
         <div> 
@@ -55,9 +55,9 @@ export default {
     GalleryList
   },
   mounted () {
-    this.$store.dispatch('app/refreshGalleries');
-    this.$axios.get('health').then(resp => {
-      this.version = resp.data.version;
+    this.$store.dispatch('app/refreshGalleries', this.$client);
+    this.$client.getHealth().then(resp => {
+      this.version = resp.version;
     });
   },
   data () {

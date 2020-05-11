@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Zwyssigly.Functional;
 
-namespace Zwyssigly.ImageServer
+namespace Zwyssigly.ImageServer.Images
 {
 
     public interface IImageRepository

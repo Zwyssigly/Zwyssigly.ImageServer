@@ -20,13 +20,19 @@ namespace Zwyssigly.ImageServer.Embedded
 
         public async Task<Result<Unit, Contracts.Error>> DeleteAsync(string galleryName, IEnumerable<string> ids)
         {
-            var result = await _uploadService.Delete(Name.FromString(galleryName).UnwrapOrThrow(), ids.Select(id => Id.FromString(id).UnwrapOrThrow()));
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(name => ToIds(ids)
+                .AndThenAsync(i => _uploadService.Delete(name, i)));
+
             return result.MapFailure(ErrorExtensions.ToContract);
         }
 
         public async Task<Result<IReadOnlyCollection<Contracts.Image>, Contracts.Error>> GetAsync(string galleryName, IEnumerable<string> ids)
         {
-            var result = await _repository.Get(Name.FromString(galleryName).UnwrapOrThrow(), ids.Select(id => Id.FromString(id).UnwrapOrThrow()));
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(name => ToIds(ids)
+                .AndThenAsync(i => _repository.Get(name, i)));
+
             return result.Map(
                 s => (IReadOnlyCollection<Contracts.Image>)s.Select(ToContract).ToArray(),
                 ErrorExtensions.ToContract);
@@ -34,7 +40,7 @@ namespace Zwyssigly.ImageServer.Embedded
 
         public async Task<Result<Contracts.Page<Contracts.Image>, Contracts.Error>> ListAsync(string galleryName, uint skip, uint take)
         {
-            var result = await _repository.List(Name.FromString(galleryName).UnwrapOrThrow(), skip, take);
+            var result = await Name.FromString(galleryName).AndThenAsync(name => _repository.List(name, skip, take));
             return result.Map(
                 p => new Contracts.Page<Contracts.Image>(p.Items.Select(ToContract).ToArray(), p.TotalItems),
                 ErrorExtensions.ToContract);
@@ -42,42 +48,34 @@ namespace Zwyssigly.ImageServer.Embedded
 
         public async Task<Result<Contracts.Image, Contracts.Error>> ReplaceAsync(string galleryName, string imageId, byte[] data, byte[] meta)
         {
-            var result = await _uploadService.ReplaceAsync(
-                Name.FromString(galleryName).UnwrapOrThrow(),
-                Id.FromString(imageId).UnwrapOrThrow(), 
-                data,
-                meta?.Length > 0 ? Option.Some(meta) : Option.None());
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(name => Id.FromString(imageId)
+                .AndThenAsync(id => _uploadService.ReplaceAsync(name, id, data, meta?.Length > 0 ? Option.Some(meta) : Option.None())));
 
             return result.Map(ToContract, ErrorExtensions.ToContract);
         }
 
         public async Task<Result<Contracts.Image, Contracts.Error>> ReplaceAsync(string galleryName, string imageId, string url, byte[] meta)
         {
-            var result = await _uploadService.ReplaceAsync(
-                Name.FromString(galleryName).UnwrapOrThrow(),
-                Id.FromString(imageId).UnwrapOrThrow(),
-                url,
-                meta?.Length > 0 ? Option.Some(meta) : Option.None());
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(name => Id.FromString(imageId)
+                .AndThenAsync(id => _uploadService.ReplaceAsync(name, id, url, meta?.Length > 0 ? Option.Some(meta) : Option.None())));
 
             return result.Map(ToContract, ErrorExtensions.ToContract);
         }
 
         public async Task<Result<Contracts.Image, Contracts.Error>> UploadAsync(string galleryName, byte[] data, byte[] meta)
         {
-            var result = await _uploadService.UploadAsync(
-                Name.FromString(galleryName).UnwrapOrThrow(),
-                data,
-                meta?.Length > 0 ? Option.Some(meta) : Option.None());
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(name => _uploadService.UploadAsync(name, data, meta?.Length > 0 ? Option.Some(meta) : Option.None()));
 
             return result.Map(ToContract, ErrorExtensions.ToContract);
         }
 
         public async Task<Result<Contracts.Image, Contracts.Error>> UploadAsync(string galleryName, string url, byte[] meta)
         {
-            var result = await _uploadService.UploadAsync(
-                Name.FromString(galleryName).UnwrapOrThrow(),
-                url,
-                meta?.Length > 0 ? Option.Some(meta) : Option.None());
+            var result = await Name.FromString(galleryName)
+                .AndThenAsync(name => _uploadService.UploadAsync(name, url, meta?.Length > 0 ? Option.Some(meta) : Option.None()));
 
             return result.Map(ToContract, ErrorExtensions.ToContract);
         }
@@ -98,9 +96,14 @@ namespace Zwyssigly.ImageServer.Embedded
                     width: s.Resolution.Width,
                     height: s.Resolution.Height,
                     cropStrategy: s.CropStrategy.Map(f => f.ToString()).UnwrapOrDefault(),
-                    format: s.ImageFormat.FileExtension
+                    format: s.ImageFormat.FileExtension,
+                    quality: s.Quality.ToScaler(),
+                    duplicateOf: s.DuplicateOf.Map(d => d.ToString()).UnwrapOrDefault()
                 )).ToArray()
             );
         }
+
+        private Result<IReadOnlyList<Id>, Error> ToIds(IEnumerable<string> ids)
+            => ids.Select(id => Id.FromString(id)).Railway();
     }
 }
