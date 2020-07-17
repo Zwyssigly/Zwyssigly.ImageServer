@@ -20,7 +20,8 @@ COPY --from=dotnet-build /app/Zwyssigly.ImageServer.Standalone/out ./
 
 ENTRYPOINT ["dotnet", "Zwyssigly.ImageServer.Standalone.dll"]
 
-EXPOSE 80
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
 
 VOLUME /usr/share/imageserver/data
 
