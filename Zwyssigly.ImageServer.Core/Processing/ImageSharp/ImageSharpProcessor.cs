@@ -26,7 +26,7 @@ namespace Zwyssigly.ImageServer.Processing.ImageSharp
         {
             var options = new ResizeOptions
             {
-                Size = new SixLabors.Primitives.Size(pass.Resolution.Width, pass.Resolution.Height),
+                Size = new Size(pass.Resolution.Width, pass.Resolution.Height),
                 Sampler = KnownResamplers.Lanczos2
             };
 
@@ -40,14 +40,14 @@ namespace Zwyssigly.ImageServer.Processing.ImageSharp
 
             using var image = _image.Clone(ctx => ctx
                 .Resize(options)
-                .BackgroundColor(SixLabors.ImageSharp.Color.FromHex(pass.Color.ToString()))
+                .BackgroundColor(SixLabors.ImageSharp.Color.ParseHex(pass.Color.ToString()))
             );
 
             using var stream = new MemoryStream();
             if (pass.ImageFormat == ImageFormat.Jpeg)
                 image.SaveAsJpeg(stream, new JpegEncoder { Quality = (int)(pass.Quality.ToScaler() * 100) });
             else if (pass.ImageFormat == ImageFormat.Png)
-                image.SaveAsPng(stream, new PngEncoder { CompressionLevel = (int)(pass.Quality.ToScaler() * 8) + 1 });
+                image.SaveAsPng(stream, new PngEncoder { CompressionLevel = (PngCompressionLevel)(int)(pass.Quality.ToScaler() * 9) });
             else
                 throw new InvalidOperationException();
 

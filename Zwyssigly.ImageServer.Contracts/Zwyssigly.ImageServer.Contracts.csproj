@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Zwyssigly.Functional" Version="0.1.6" />
+    <PackageReference Include="Zwyssigly.Functional" Version="0.1.11" />
   </ItemGroup>
 
 </Project>
